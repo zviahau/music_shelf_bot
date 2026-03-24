@@ -30,25 +30,18 @@ from aiohttp import web
 import threading
 
 
-from aiohttp import web
-
-# 1. Функция-ответчик для Koyeb
 async def handle_koyeb(request):
-    return web.Response(text="Bot is running!")
+    return web.Response(text="OK")
 
-# 2. Функция для запуска веб-сервера ПАРАЛЛЕЛЬНО с ботом
-async def start_web_server():
+async def setup_koyeb():
     app = web.Application()
     app.router.add_get('/', handle_koyeb)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', 8000)
     await site.start()
+    print("Koyeb Health Check server started on port 8000")
 
-# 3. В твоей основной функции (где запускается бот, обычно async def main()):
-async def main():
-    # Запускаем веб-сервер внутри того же цикла, что и бота
-    await start_web_server()
 
 
 def _image_ext_from_content_type(content_type: "str | None") -> str:
@@ -447,6 +440,8 @@ async def send_post(audio_path: Path, caption: str, artist: str, title: str) -> 
 
 
 async def main_async() -> None:
+    await setup_koyeb()
+    
     load_dotenv()
     MUSIC_INPUT_DIR.mkdir(parents=True, exist_ok=True)
 
