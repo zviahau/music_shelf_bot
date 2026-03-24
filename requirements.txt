@@ -1,0 +1,7 @@
+aiogram
+apscheduler
+openai
+requests
+python-dotenv
+tinytag
+pytz
