@@ -6,3 +6,4 @@ python-dotenv
 tinytag
 pytz
 mutagen
+aiohttp
