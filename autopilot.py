@@ -29,18 +29,26 @@ from config import AUDIO_EXTENSIONS, MUSIC_INPUT_DIR
 from aiohttp import web
 import threading
 
-# Функция для запуска фейкового веб-сервера
-async def hello(request):
-    return web.Response(text="I am alive!")
 
-def run_health_check():
+from aiohttp import web
+
+# 1. Функция-ответчик для Koyeb
+async def handle_koyeb(request):
+    return web.Response(text="Bot is running!")
+
+# 2. Функция для запуска веб-сервера ПАРАЛЛЕЛЬНО с ботом
+async def start_web_server():
     app = web.Application()
-    app.add_routes([web.get('/', hello)])
-    # Запускаем на порту 8000, который так хочет Koyeb
-    web.run_app(app, port=8000)
+    app.router.add_get('/', handle_koyeb)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 8000)
+    await site.start()
 
-# Запускаем сервер в отдельном потоке, чтобы он не мешал боту
-threading.Thread(target=run_health_check, daemon=True).start()
+# 3. В твоей основной функции (где запускается бот, обычно async def main()):
+async def main():
+    # Запускаем веб-сервер внутри того же цикла, что и бота
+    await start_web_server()
 
 
 def _image_ext_from_content_type(content_type: "str | None") -> str:
