@@ -26,6 +26,22 @@ from apscheduler.triggers.cron import CronTrigger
 
 from config import AUDIO_EXTENSIONS, MUSIC_INPUT_DIR
 
+from aiohttp import web
+import threading
+
+# Функция для запуска фейкового веб-сервера
+async def hello(request):
+    return web.Response(text="I am alive!")
+
+def run_health_check():
+    app = web.Application()
+    app.add_routes([web.get('/', hello)])
+    # Запускаем на порту 8000, который так хочет Koyeb
+    web.run_app(app, port=8000)
+
+# Запускаем сервер в отдельном потоке, чтобы он не мешал боту
+threading.Thread(target=run_health_check, daemon=True).start()
+
 
 def _image_ext_from_content_type(content_type: "str | None") -> str:
     if not content_type:
